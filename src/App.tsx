@@ -41,22 +41,29 @@ function updateState(s) {
 function App() {
 	const [, setPressedKey] = useState<string>(undefined);
 	const [, setNextKey] = useState<number>(undefined);
+
 	useEffect(() => {
-		window.addEventListener('keydown', e => {
+		const handleKeyDown = (e: KeyboardEvent) => {
 			key = e.key;
 			pressedKeys.push(e.key);
 			setPressedKey(e.key);
 			updateState(GameState);
-		});
+		}
+		window.addEventListener('keydown', handleKeyDown);
+
+		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, []);
+
 	useEffect(() => {
-		setInterval(() => {
+		const intervalId = setInterval(() => {
 			const badVariableNaming = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 			nextKey = badVariableNaming[Math.floor(Math.random() * 4)];
 			keys.push(nextKey);
 			setNextKey(nextKey);
 			updateState(GameState);
 		}, 3000);
+
+		return () => clearInterval(intervalId);
 	}, []);
 
 	return (
