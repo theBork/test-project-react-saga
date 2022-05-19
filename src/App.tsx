@@ -1,70 +1,110 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import cn from 'classnames';
 
-let nextKey, key;
-const keys = [],
-	pressedKeys = [];
 const KEY_CODE_INPUT_TITLE_MAP = {
 	ArrowUp: '↑',
 	ArrowDown: '↓',
-	ArrowLeft: '→',
-	ArrowRigt: '←',
+	ArrowLeft: '←',
+	ArrowRight: '→',
 };
+
+type KeyCodeInputTitleMapType = keyof typeof KEY_CODE_INPUT_TITLE_MAP;
 
 const LIVES_COUNT = 3;
 
-const GameState = {
+interface GameState {
+	errors: number;
+	alignedIndexes: number[];
+}
+
+const initialGameState: GameState = {
 	errors: 0,
 	alignedIndexes: [],
 };
 
-function updateState(s) {
-	if (key === undefined) {
-		return;
-	}
-	if (key === [...keys].reverse()[0]) {
-		s.alignedIndexes.push(keys.length - 1);
+const isValidKey = (key: string): key is KeyCodeInputTitleMapType => {
+	return Object.keys(KEY_CODE_INPUT_TITLE_MAP).includes(key);
+}
+
+function updateState(gameState: GameState, pressedKeys: KeyCodeInputTitleMapType[], keysToPress: KeyCodeInputTitleMapType[]) {
+	const pressedKey = pressedKeys[pressedKeys.length - 1];
+	const keyShouldBePressed = keysToPress[keysToPress.length - 1];
+
+	if (pressedKey === keyShouldBePressed) {
+		return {
+			...gameState,
+			alignedIndexes: [...gameState.alignedIndexes, keysToPress.length - 1],
+		}
 	} else {
-		s.errors++;
-	}
-	key = undefined;
-	if (s.errors > LIVES_COUNT - 1) {
-		confirm('You lost!') || document.location.reload();
-	}
-	if (s.alignedIndexes.length > 2) {
-		confirm('You won!') || document.location.reload();
+		return {
+			...gameState,
+			errors: gameState.errors + 1,
+		};
 	}
 }
 
 function App() {
-	const [, setPressedKey] = useState<string>(undefined);
-	const [, setNextKey] = useState<number>(undefined);
+	const [gameState, setGameState] = useState<GameState>(initialGameState);
+	const [pressedKeys, setPressedKeys] = useState<KeyCodeInputTitleMapType[]>([]);
+	const [keysToPress, setKeysToPress] = useState<KeyCodeInputTitleMapType[]>([]);
+	const isButtonPressedInThisTickRef = useRef(false);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			key = e.key;
-			pressedKeys.push(e.key);
-			setPressedKey(e.key);
-			updateState(GameState);
-		}
+			const pressedKey = e.key;
+			if (!isValidKey(pressedKey)) {
+				setGameState(prevGameState => ({
+					...prevGameState,
+					errors: prevGameState.errors + 1,
+				}));
+
+				return;
+			}
+
+			isButtonPressedInThisTickRef.current = true;
+			setPressedKeys(prevPressedKeys => [...prevPressedKeys, pressedKey]);
+		};
+
 		window.addEventListener('keydown', handleKeyDown);
 
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, []);
 
 	useEffect(() => {
-		const intervalId = setInterval(() => {
-			const badVariableNaming = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-			nextKey = badVariableNaming[Math.floor(Math.random() * 4)];
-			keys.push(nextKey);
-			setNextKey(nextKey);
-			updateState(GameState);
+		if (!pressedKeys.length) return;
+		setGameState(prevGameState => updateState(prevGameState, pressedKeys, keysToPress));
+	}, [pressedKeys]);
+
+	useEffect(() => {
+		if (gameState.errors >= LIVES_COUNT) {
+			confirm('You lost!');
+			document.location.reload();
+		}
+		if (gameState.alignedIndexes.length >= 3) {
+			confirm('You won!');
+			document.location.reload();
+		}
+	}, [gameState]);
+
+	useEffect(() => {
+		isButtonPressedInThisTickRef.current = false;
+		const timeoutId = setTimeout(() => {
+			if (keysToPress.length && !isButtonPressedInThisTickRef.current) {
+				setGameState(prevGameState => ({
+					...prevGameState,
+					errors: prevGameState.errors + 1,
+				}));
+			}
+
+			const badVariableNaming = Object.keys(KEY_CODE_INPUT_TITLE_MAP) as KeyCodeInputTitleMapType[];
+			const nextKey = badVariableNaming[Math.floor(Math.random() * 4)];
+			setKeysToPress(prevKeysToPress => [...prevKeysToPress, nextKey]);
 		}, 3000);
 
-		return () => clearInterval(intervalId);
-	}, []);
+		return () => clearTimeout(timeoutId);
+	}, [keysToPress]);
 
 	return (
 		<div className="App">
@@ -75,13 +115,15 @@ function App() {
 				<div className="main-container__input">
 					<div className="main-container__input-title">Next:</div>
 					<div className="main-container__input-values">
-						{keys.reverse().map((k, i) => (
+						{keysToPress.map((k, i) => (
 							<div
 								className={cn('main-container__input-value', {
 									['main-container__input-value_aligned']:
-										GameState.alignedIndexes.indexOf(i) !== -1,
+										gameState.alignedIndexes.indexOf(i) !== -1,
+									['main-container__input-value_error']:
+									i !== keysToPress.length - 1 && gameState.alignedIndexes.indexOf(i) === -1,
 								})}
-								key={1}
+								key={`next${i}`}
 							>
 								{' '}
 								{KEY_CODE_INPUT_TITLE_MAP[k]}
@@ -92,8 +134,8 @@ function App() {
 				<div className="main-container__input">
 					<div className="main-container__input-title">Input:</div>
 					<div className="main-container__input-values">
-						{pressedKeys.reverse().map(k => (
-							<div className={'main-container__input-value'} key={2}>
+						{pressedKeys.map((k, i) => (
+							<div className={'main-container__input-value'} key={`input${i}`}>
 								{' '}
 								{KEY_CODE_INPUT_TITLE_MAP[k]}
 							</div>
@@ -101,8 +143,8 @@ function App() {
 					</div>
 				</div>
 				<div className="main-container__input">
-					<div className="main-container__input-value main-container__input-value_error">
-						{Array(LIVES_COUNT - GameState.errors)
+					<div className="main-container__input-value">
+						{Array(LIVES_COUNT - gameState.errors)
 							.fill('❤️')
 							.map(l => l)}
 					</div>

@@ -56,10 +56,13 @@
 
 .main-container__input-values {
 	display: flex;
+	justify-content: flex-end;
+	flex-direction: row-reverse;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	width: 360px;
 	white-space: nowrap;
+
 }
 
 .main-container__input-value {
