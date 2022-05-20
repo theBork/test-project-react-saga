@@ -56,7 +56,9 @@
 
 .main-container__input-values {
 	display: flex;
+	height: 45px;
 	justify-content: flex-end;
+	align-items: center;
 	flex-direction: row-reverse;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -66,12 +68,25 @@
 }
 
 .main-container__input-value {
+	display: inline-block;
+	width: 40px;
+	height: 40px;
 	font-size: 40px;
 	color: yellow;
 }
 
-.main-container__input-value:first-child {
+.main-container__lives {
+	height: 50px;
+}
+
+.main-container__lives-item {
+	font-size: 40px;
+}
+
+.main-container__input-value:last-child {
 	font-size: 45px;
+	width: 45px;
+	height: 45px;
 }
 
 .main-container__input-value.main-container__input-value_aligned {
