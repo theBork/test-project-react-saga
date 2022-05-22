@@ -10,9 +10,10 @@ import {
 } from "../reducers/game";
 
 import { getRandomAvailableKey } from "../../utils/getRandomAvailableKey";
+import { AppState } from "../store";
 
 function* workCurrentStepResults() {
-  const keyChain = yield select(state => state.game.keyChain);
+  const { keyChain }: AppState["game"] = yield select((state: AppState) => state.game);
   if (keyChain.length) {
     const currKey = keyChain[keyChain.length - 1];
     if (currKey.keyToPress !== currKey.pressedKey) {
@@ -24,7 +25,7 @@ function* workCurrentStepResults() {
 }
 
 function* workUpdateGameStatus() {
-  const { game: { livesAmount, correctSteps } } = yield select(state => state);
+  const { livesAmount, correctSteps }: AppState["game"] = yield select(state => state.game);
   if (livesAmount <= 0) {
     yield put(setGameStatus({ gameStatus: "lose" }));
   }
@@ -42,7 +43,7 @@ function* workAddNewStep() {
 function* workProcessNewStep() {
   yield workCurrentStepResults();
   yield workUpdateGameStatus();
-  const { game: { gameStatus } } = yield select(state => state);
+  const { gameStatus }: AppState["game"] = yield select(state => state.game);
   if (gameStatus === "progress") yield workAddNewStep();
 }
 

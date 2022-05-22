@@ -7,9 +7,9 @@ const isValidKey = (key: string): key is AvailableKeys => {
 	return Object.keys(availableKeysMap).includes(key);
 }
 
-function* handleKeyPress(action: any) {
+function* handleKeyPress(action: ReturnType<typeof keyPress>) {
   yield put(stopListenKeyPress());
-  const pressedKey: string = action.payload;
+  const pressedKey = action.payload;
   if (isValidKey(pressedKey)) yield put(setPressedKey({ pressedKey }));
 }
 
