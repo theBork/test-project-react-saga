@@ -50,13 +50,15 @@ function App() {
 					<div className="main-container__input-values">
 						{keyChain.map((k, i) => (
 							<div
+								key={`next${i}`}
 								className={cn('main-container__input-value', {
 									['main-container__input-value_aligned']: k.keyToPress === k.pressedKey,
-									['main-container__input-value_error']: i !== keyChain.length - 1 && k.keyToPress !== k.pressedKey,
+									['main-container__input-value_error']: i === keyChain.length - 1
+										? k.pressedKey && k.keyToPress !== k.pressedKey
+										: k.keyToPress !== k.pressedKey,
 								})}
-								key={`next${i}`}
+								data-testid="key-to-press"
 							>
-								{' '}
 								{availableKeysMap[k.keyToPress]}
 							</div>
 						))}
@@ -66,8 +68,7 @@ function App() {
 					<div className="main-container__input-title">Input:</div>
 					<div className="main-container__input-values">
 						{keyChain.map((k, i) => (
-							<div className={'main-container__input-value'} key={`input${i}`}>
-								{' '}
+							<div key={`input${i}`} className={'main-container__input-value'} data-testid="pressed-key">
 								{k.pressedKey ? availableKeysMap[k.pressedKey] : ""}
 							</div>
 						))}

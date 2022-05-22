@@ -9,7 +9,7 @@ import {
   startListenKeyPress,
 } from "../reducers/game";
 
-import { availableKeysMap, AvailableKeys } from "../../constants/keys";
+import { getRandomAvailableKey } from "../../utils/getRandomAvailableKey";
 import { RootState } from "../reducers";
 
 function* workCurrentStepResults() {
@@ -35,8 +35,7 @@ function* workUpdateGameStatus() {
 }
 
 function* workAddNewStep() {
-  const availableKeys = Object.keys(availableKeysMap) as AvailableKeys[];
-  const nextKey = availableKeys[Math.floor(Math.random() * 4)];
+  const nextKey = getRandomAvailableKey();
   yield put(addToKeyChain({ keyToPress: nextKey, pressedKey: null }));
   yield put(startListenKeyPress());
 }
