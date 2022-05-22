@@ -10,7 +10,6 @@ import {
 } from "../reducers/game";
 
 import { getRandomAvailableKey } from "../../utils/getRandomAvailableKey";
-import { RootState } from "../reducers";
 
 function* workCurrentStepResults() {
   const keyChain = yield select(state => state.game.keyChain);
@@ -25,7 +24,7 @@ function* workCurrentStepResults() {
 }
 
 function* workUpdateGameStatus() {
-  const { game: { livesAmount, correctSteps } }: RootState = yield select(state => state);
+  const { game: { livesAmount, correctSteps } } = yield select(state => state);
   if (livesAmount <= 0) {
     yield put(setGameStatus({ gameStatus: "lose" }));
   }
@@ -43,7 +42,7 @@ function* workAddNewStep() {
 function* workProcessNewStep() {
   yield workCurrentStepResults();
   yield workUpdateGameStatus();
-  const { game: { gameStatus } }: RootState = yield select(state => state);
+  const { game: { gameStatus } } = yield select(state => state);
   if (gameStatus === "progress") yield workAddNewStep();
 }
 
