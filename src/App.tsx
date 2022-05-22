@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import cn from "classnames";
-import { useDispatch } from "react-redux";
 import useAppSelector from "./hooks/useAppSelector";
-import {keyPress, processNewStep, startGame} from "./store/reducers/game";
+import useAppDispatch from "./hooks/useAppDispatch";
+import { keyPress, processNewStep, startGame } from "./store/reducers/game";
 import { availableKeysMap } from "./constants/keys";
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const gameState = useAppSelector(state => state.game);
 	const { isListenKeyPress, livesAmount, keyChain, gameStatus } = gameState;
 
