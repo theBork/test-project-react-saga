@@ -7,12 +7,12 @@ const isValidKey = (key: string): key is AvailableKeys => {
 	return Object.keys(availableKeysMap).includes(key);
 }
 
-function* handleKeyPress(action: ReturnType<typeof keyPress>) {
+function* workHandleKeyPress(action: ReturnType<typeof keyPress>) {
   yield put(stopListenKeyPress());
   const pressedKey = action.payload;
   if (isValidKey(pressedKey)) yield put(setPressedKey({ pressedKey }));
 }
 
 export function* keyPressSaga() {
-  yield takeEvery(keyPress.type, handleKeyPress)
+  yield takeEvery(keyPress.type, workHandleKeyPress)
 }
