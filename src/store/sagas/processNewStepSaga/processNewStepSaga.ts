@@ -7,10 +7,10 @@ import {
   setGameStatus,
   addToKeyChain,
   startListenKeyPress,
-} from "../reducers/game";
+} from "../../reducers/game";
 
-import { getRandomAvailableKey } from "../../utils/getRandomAvailableKey";
-import { AppState } from "../store";
+import { getRandomAvailableKey } from "../../../utils/getRandomAvailableKey";
+import { AppState } from "../../store";
 
 function* workCurrentStepResults() {
   const { keyChain }: AppState["game"] = yield select((state: AppState) => state.game);

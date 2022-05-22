@@ -6,7 +6,7 @@ interface KeyToPressData {
   pressedKey: AvailableKeys | null;
 }
 
-interface GameState {
+export interface GameState {
   gameStatus: "pending" | "progress" | "lose" | "win";
   keyChain: KeyToPressData[];
   isListenKeyPress: boolean;
@@ -14,7 +14,7 @@ interface GameState {
   correctSteps: number;
 }
 
-const initialState: GameState = {
+export const initialState: GameState = {
   gameStatus: "pending",
   keyChain: [],
   isListenKeyPress: true,

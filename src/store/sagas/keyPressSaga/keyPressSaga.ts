@@ -1,7 +1,7 @@
 import { put, takeEvery } from "redux-saga/effects";
 
-import { availableKeysMap, AvailableKeys } from "../../constants/keys";
-import { keyPress, setPressedKey, stopListenKeyPress } from "../reducers/game";
+import { availableKeysMap, AvailableKeys } from "../../../constants/keys";
+import { keyPress, setPressedKey, stopListenKeyPress } from "../../reducers/game";
 
 const isValidKey = (key: string): key is AvailableKeys => {
 	return Object.keys(availableKeysMap).includes(key);
